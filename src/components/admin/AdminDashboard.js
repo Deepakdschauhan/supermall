@@ -1,0 +1,104 @@
+import React, { useState, useEffect } from 'react';
+import { auth, db } from '../../firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, getDocs, setDoc, deleteDoc, doc } from 'firebase/firestore';
+import "../../style/forms.css";
+
+const AdminDashboard = () => {
+  const [merchantName, setMerchantName] = useState('');
+  const [merchantEmail, setMerchantEmail] = useState('');
+  const [merchantPassword, setMerchantPassword] = useState('');
+  const [merchants, setMerchants] = useState([]);
+
+  // Fetch all users with role = merchant
+  const fetchMerchants = async () => {
+    const snapshot = await getDocs(collection(db, 'users'));
+    const data = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(user => user.role === 'merchant');
+    setMerchants(data);
+  };
+
+  useEffect(() => {
+    fetchMerchants();
+  }, []);
+
+  // Create a new merchant with Firebase Auth + Firestore
+  const handleAddMerchant = async () => {
+    if (!merchantEmail || !merchantPassword || !merchantName) {
+      return alert("All fields required.");
+    }
+
+    try {
+      // 1. Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, merchantEmail, merchantPassword);
+      const user = userCredential.user;
+
+      // 2. Add merchant info in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name: merchantName,
+        email: merchantEmail,
+        role: 'merchant'
+      });
+
+      // Clear form & refresh list
+      setMerchantName('');
+      setMerchantEmail('');
+      setMerchantPassword('');
+      fetchMerchants();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  // Remove merchant from Firestore (and optionally Auth if you want)
+  const handleRemoveMerchant = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'users', id));
+      fetchMerchants();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Admin Dashboard</h2>
+
+      <div>
+        <h4>Add Merchant</h4>
+        <input
+          type="text"
+          placeholder="Merchant Name"
+          value={merchantName}
+          onChange={(e) => setMerchantName(e.target.value)}
+        />
+        <input
+          type="email"
+          placeholder="Merchant Email"
+          value={merchantEmail}
+          onChange={(e) => setMerchantEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Merchant Password"
+          value={merchantPassword}
+          onChange={(e) => setMerchantPassword(e.target.value)}
+        />
+        <button onClick={handleAddMerchant}>Add Merchant</button>
+      </div>
+
+      <h4>Merchants List</h4>
+      <ul>
+        {merchants.map((merchant) => (
+          <li key={merchant.id}>
+            {merchant.name} - {merchant.email}
+            <button onClick={() => handleRemoveMerchant(merchant.id)}>Remove</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default AdminDashboard;
