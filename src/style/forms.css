@@ -11,7 +11,7 @@ form {
   
   /* Input fields */
   input, select {
-    width: 100%;
+    width: 50%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;

@@ -2,6 +2,14 @@
   text-align: center;
 }
 
+.bgimg{
+  background-image: url('/src/mall.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh; /* Full screen height */
+  width: 100%;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

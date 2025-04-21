@@ -26,7 +26,7 @@ const MerchantLogin = () => {
         const userData = docSnap.data();
 
         if (userData.role === 'merchant') {
-          localStorage.setItem('merchantId', user.uid); // Store UID if needed
+          localStorage.setItem('merchantId', user.uid);
           navigate('/merchant-dashboard');
         } else {
           alert('Not a merchant account');

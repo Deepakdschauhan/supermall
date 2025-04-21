@@ -9,11 +9,13 @@ import UserDashboard from './components/user/UserDashboard';
 import TrackOrders from './components/user/TrackOrders';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import './App.css';
 
 
 const App = () => {
   return (
     <>
+     <div className="bgimg">
       <Navbar />
       <Routes>
 
@@ -60,6 +62,7 @@ const App = () => {
 />
 
       </Routes>
+      </div>
     </>
   );
 };

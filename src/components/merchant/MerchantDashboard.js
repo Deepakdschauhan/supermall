@@ -4,6 +4,8 @@ import "../../style/forms.css";
 import {
   collection,
   addDoc,
+  doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp
@@ -16,12 +18,19 @@ const MerchantDashboard = () => {
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [merchantInfo, setMerchantInfo] = useState(null);
 
   // Get current merchant's UID
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    const unsubscribe = auth.onAuthStateChanged( async user => {
       if (user) {
         setMerchantId(user.uid);
+
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setMerchantInfo(docSnap.data());
+        }
       }
     });
     return () => unsubscribe();
@@ -69,6 +78,14 @@ const MerchantDashboard = () => {
   return (
     <div>
       <h2>Merchant Dashboard</h2>
+      {merchantInfo && (
+  <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
+    <h3>Shop Information</h3>
+    <p><strong>Shop Number:</strong> {merchantInfo.shopnumber}</p>
+    <p><strong>Shop Floor:</strong> {merchantInfo.shopfloor}</p>
+    <p><strong>Offer:</strong> {merchantInfo.offer}</p>
+  </div>
+)}
 
       <h3>Add New Item</h3>
       <input

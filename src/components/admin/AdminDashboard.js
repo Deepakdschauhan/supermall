@@ -9,6 +9,9 @@ const AdminDashboard = () => {
   const [merchantEmail, setMerchantEmail] = useState('');
   const [merchantPassword, setMerchantPassword] = useState('');
   const [merchants, setMerchants] = useState([]);
+  const [shopnum, setShopnum] = useState([]);
+  const [shopfloor, setShopfloor] = useState([]);
+  const [offer, setOffer] = useState([]);
 
   // Fetch all users with role = merchant
   const fetchMerchants = async () => {
@@ -25,7 +28,7 @@ const AdminDashboard = () => {
 
   // Create a new merchant with Firebase Auth + Firestore
   const handleAddMerchant = async () => {
-    if (!merchantEmail || !merchantPassword || !merchantName) {
+    if (!merchantEmail || !merchantPassword || !merchantName || !shopnum || !shopfloor || !offer) {
       return alert("All fields required.");
     }
 
@@ -38,13 +41,19 @@ const AdminDashboard = () => {
       await setDoc(doc(db, 'users', user.uid), {
         name: merchantName,
         email: merchantEmail,
-        role: 'merchant'
+        role: 'merchant',
+        shopnumber: shopnum,
+        shopfloor: shopfloor,
+        offer: offer,
       });
 
       // Clear form & refresh list
       setMerchantName('');
       setMerchantEmail('');
       setMerchantPassword('');
+      setShopnum('');
+      setShopfloor('');
+      setOffer('');
       fetchMerchants();
     } catch (error) {
       alert(error.message);
@@ -85,7 +94,25 @@ const AdminDashboard = () => {
           value={merchantPassword}
           onChange={(e) => setMerchantPassword(e.target.value)}
         />
-        <button onClick={handleAddMerchant}>Add Merchant</button>
+        <input
+          type="number"
+          placeholder="shop number"
+          value={shopnum}
+          onChange={(e) => setShopnum(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Shop Floor"
+          value={shopfloor}
+          onChange={(e) => setShopfloor(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Offer Details"
+          value={offer}
+          onChange={(e) => setOffer(e.target.value)}
+        />
+        <button onClick={handleAddMerchant}>Add Merchant And Shop Details</button>
       </div>
 
       <h4>Merchants List</h4>
